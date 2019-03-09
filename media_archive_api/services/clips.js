@@ -5,8 +5,7 @@ async function listClips(){
 }
 
 async function addClip(){
-	clips_model.insert("name", "size_bytes", "duration", "aspect", "size_screen", "created_date", "modified_date", "tags", "thumbnail", "proxy", "o_pxy_id", "o_asset_type", "format_uid", "a_owner_uid", "a_groups", "a_users", "h_main_origin_uid", "h_origins", "license", "restored_count")
-    return 0
+	return clips_model.insert("name", "size_bytes", "duration", "aspect", "size_screen", "created_date", "modified_date", "tags", "thumbnail", "proxy", "o_pxy_id", "o_asset_type", "format_uid", "a_owner_uid", "a_groups", "a_users", "h_main_origin_uid", "h_origins", "license", "restored_count")
 }
 
 module.exports = {

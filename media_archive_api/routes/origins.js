@@ -1,22 +1,20 @@
 const express = require('express');
 const router = express.Router();
 
-const clips_ctrl = require('../services/clips');
+const origins_ctrl = require('../services/origins');
 
-/* GET home page. */
 router.get('/', function(req, res) {
-  clips_ctrl.listClips().
-  then(function(val) {
-    res.json(val);
-  });
-
+    origins_ctrl.listOrigins().
+    then(function(val) {
+        res.json(val);
+    });
 });
 
 router.post('/', function(req, res) {
-    clips_ctrl.addClip().
+    origins_ctrl.addOrigin().
     then(function(val) {
-      res.json(val);
+        res.json(val);
     });
-  });
+});
 
 module.exports = router;
