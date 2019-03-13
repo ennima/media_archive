@@ -29,20 +29,21 @@ function find( transaction_uid ) {
 
 /**
  * Insert Transaction.
- * @param {String} clip_uid Clip uid.
- * @param {String} action Action.
- * @param {String} date Date.
- * @param {String} user_uid User uid.
- * @param {String} host_uid Host uid.
- * @param {String} app_uid App uid.
- * @param {String} description Description.
+ * @param {String} clip Clip object whit data.
  * @returns {Promise} Promise with data or error
  */
-function insert(clip_uid, action, date, user_uid, host_uid, app_uid, description) {
+function insert(clip) {
   return db.runQuery(`INSERT INTO media_archive.transactions
         (clip_uid, action, date, user_uid, host_uid, app_uid, description)
         VALUES( ?, ?, ?, ?, ?, ?, ?);`, [
-        clip_uid, action, date, user_uid, host_uid, app_uid, description]);
+        clip.clip_uid,
+        clip.action,
+        clip.date,
+        clip.user_uid,
+        clip.host_uid,
+        clip.app_uid,
+        clip.description
+      ]);
 }
 
 

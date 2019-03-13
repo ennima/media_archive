@@ -28,19 +28,21 @@ function listTransactions(req, res) {
  * @returns {bool} True if all its ok.
  */
 function addTransaction(req, res) {
-    console.log('Body',req.body)
+    // console.log('Body',req.body)
 
-    let clip = {
-        'clip_uid': 1,
-        'action': 'store',
+    const clip = req.body
+
+    const new_clip = {
+        'clip_uid': clip.clip_uid,
+        'action': clip.action,
         'date': moment().format('YYYY-MM-DD H:mm:ss'),
-        'user_uid': 3,
-        'host_uid': 2,
-        'app_uid': 1,
-        'description': 'Storing transaction'
-        }
+        'user_uid': clip.user_uid,
+        'host_uid': clip.host_uid,
+        'app_uid': clip.app_uid,
+        'description': clip.description
+        };
 
-    transactions_model.insert(clip.clip_uid, clip.action, clip.date, clip.user_uid, clip.host_uid, clip.app_uid, clip.description).
+    transactions_model.insert(new_clip).
     then(function(val) {
         res.json(val);
     });
