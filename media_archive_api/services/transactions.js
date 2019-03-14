@@ -48,16 +48,16 @@ function listTransactions(req, res) {
 function addTransaction(req, res) {
     // console.log('Body',req.body)
 
-    const clip = req.body
+    const transaction = req.body
 
     const new_transaction = {
-        'clip_uid': clip.clip_uid,
-        'action': clip.action,
+        'clip_uid': transaction.clip_uid,
+        'action': transaction.action,
         'date': moment().format(date_format_store),
-        'user_uid': clip.user_uid,
-        'host_uid': clip.host_uid,
-        'app_uid': clip.app_uid,
-        'description': clip.description
+        'user_uid': transaction.user_uid,
+        'host_uid': transaction.host_uid,
+        'app_uid': transaction.app_uid,
+        'description': transaction.description
         };
 
     transactions_model.insert(new_transaction).

@@ -4,19 +4,9 @@ const router = express.Router();
 const clips_ctrl = require('../services/clips');
 
 /* GET home page. */
-router.get('/', function(req, res) {
-  clips_ctrl.listClips().
-  then(function(val) {
-    res.json(val);
-  });
+router.get('/', clips_ctrl.listClips);
 
-});
 
-router.post('/', function(req, res) {
-    clips_ctrl.addClip().
-    then(function(val) {
-      res.json(val);
-    });
-  });
+router.post('/', clips_ctrl.addClip);
 
 module.exports = router;
