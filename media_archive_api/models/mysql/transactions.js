@@ -32,17 +32,17 @@ function find( transaction_uid ) {
  * @param {String} clip Clip object whit data.
  * @returns {Promise} Promise with data or error
  */
-function insert(clip) {
+function insert(transaction) {
   return db.runQuery(`INSERT INTO media_archive.transactions
         (clip_uid, action, date, user_uid, host_uid, app_uid, description)
         VALUES( ?, ?, ?, ?, ?, ?, ?);`, [
-        clip.clip_uid,
-        clip.action,
-        clip.date,
-        clip.user_uid,
-        clip.host_uid,
-        clip.app_uid,
-        clip.description
+        transaction.clip_uid,
+        transaction.action,
+        transaction.date,
+        transaction.user_uid,
+        transaction.host_uid,
+        transaction.app_uid,
+        transaction.description
       ]);
 }
 
