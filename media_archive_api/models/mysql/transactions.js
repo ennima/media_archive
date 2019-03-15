@@ -21,7 +21,7 @@ function count() {
  * @param {String} transaction_uid Transaction uid
  * @returns {Promise} Promise with data or error
  */
-function find( transaction_uid ) {
+function find(transaction_uid) {
   return db.runQuery(`SELECT * FROM media_archive.transactions
       WHERE media_archive.transactions.transaction_uid = ?;`, [transaction_uid]);
 }
@@ -29,7 +29,7 @@ function find( transaction_uid ) {
 
 /**
  * Insert Transaction.
- * @param {String} clip Clip object whit data.
+ * @param {String} transaction Clip object whit data.
  * @returns {Promise} Promise with data or error
  */
 function insert(transaction) {
@@ -98,7 +98,9 @@ function updateCol(transaction_uid, col_name, val) {
   return db.runQuery(`UPDATE media_archive.transactions
     SET ${col_name} = ?
     WHERE media_archive.transactions.transaction_uid = ?;`, [
-    val,transaction_uid]);
+    val,
+    transaction_uid
+  ]);
 }
 
 

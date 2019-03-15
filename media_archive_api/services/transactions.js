@@ -48,7 +48,7 @@ function listTransactions(req, res) {
 function addTransaction(req, res) {
     // console.log('Body',req.body)
 
-    const transaction = req.body
+    const transaction = req.body;
 
     const new_transaction = {
         'clip_uid': transaction.clip_uid,

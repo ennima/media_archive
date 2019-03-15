@@ -26,6 +26,28 @@ function find(clip_uid) {
       WHERE media_archive.clips.clip_uid = ?;`, [clip_uid]);
 }
 
+/**
+ * Find a Clip by Key:val
+ * @param {String} key Clip property.
+ * @param {string} val Value of property.
+ * @returns {Promise} Promise with data or error
+ */
+function findKey(key, val) {
+  return db.runQuery(`SELECT * FROM media_archive.clips
+      WHERE media_archive.clips.${key} LIKE '%${val}%';`);
+}
+
+/**
+ * Find a Clip by Key:val
+ * @param {String} key Clip property.
+ * @param {string} val Value of property.
+ * @returns {Promise} Promise with data or error
+ */
+function findKeyStrict(key, val) {
+  return db.runQuery(`SELECT * FROM media_archive.clips
+      WHERE media_archive.clips.${key} LIKE ?;`, [val]);
+}
+
 
 /**
  * Insert Clip
@@ -154,6 +176,8 @@ function updateCol(clip_uid, col_name, val) {
 module.exports = {
     count,
     find,
+    findKey,
+    findKeyStrict,
     insert,
     list,
     remove,

@@ -1,8 +1,88 @@
 const clips_model = require('../models/mysql/clips')
+
+
 var moment = require('moment');
+
+const {keyExists} = require('../utils/common');
 
 const date_format_store = 'YYYY-MM-DD H:mm:ss';
 const date_format_display = 'DD-MM-YYYY H:mm:ss';
+
+function findClipByName(req, res)
+{
+    const clip = req.body;
+       
+    if(keyExists('mode',clip) && clip.mode === 'strict')
+    {
+        console.log("Strict")
+        clips_model.findKeyStrict('name',clip.name)
+        .then(val =>{
+            res.json(val)
+        })
+        .catch(val =>{
+            res.json({"error":`bad find: ${val}`})
+        })
+
+    }else{
+        console.log("No Strict")
+        clips_model.findKey('name',clip.name)
+        .then(val =>{
+            res.json(val)
+        })
+        .catch(val =>{
+            res.json({"error":`bad find: ${val}`})
+        })
+    }
+    
+}
+
+async function addClip(req, res){
+	const clip = req.body
+    const new_clip ={
+        name: clip.name,
+        size_bytes: clip.size_bytes,
+        duration: clip.duration,
+        aspect: clip.aspect,
+        size_screen: clip.size_screen,
+        created_date: clip.created_date,
+        modified_date: clip.modified_date,
+        tags: clip.tags,
+        thumbnail: clip.thumbnail,
+        proxy: clip.proxy,
+        o_pxy_id: clip.o_pxy_id,
+        o_asset_type: clip.o_asset_type,
+        format_uid: clip.format_uid,
+        a_owner_uid: clip.a_owner_uid,
+        a_groups: clip.a_groups,
+        a_users: clip.a_users,
+        h_main_origin_uid: clip.h_main_origin_uid,
+        h_origins: clip.h_origins,
+        license: clip.license,
+        restored_count: clip.restored_count
+    }
+    clips_model.insert(new_clip)
+    .then(function(val) {
+        res.json(val);
+    });
+}
+
+async function findClip(req, res){
+    const clip = req.body;
+
+    /** En caso de que no tenga parametros */
+    if(Object.keys(clip).length <= 0)
+    {
+        res.json({"error":"Se necesita como mínimo la propiedad: name"})
+
+    }else if(Object.keys(clip).length <= 2){
+        /** Si hay parametros, busca por parametro */
+        if(keyExists('name',clip))
+        {
+            findClipByName(req, res)
+        }   
+    }
+ 
+}
 
 async function listClips(req, res){
     const clips = clips_model.list();
@@ -40,37 +120,8 @@ async function listClips(req, res){
     });
 }
 
-async function addClip(req, res){
-	const clip = req.body
-    const new_clip ={
-        name: clip.name,
-        size_bytes: clip.size_bytes,
-        duration: clip.duration,
-        aspect: clip.aspect,
-        size_screen: clip.size_screen,
-        created_date: clip.created_date,
-        modified_date: clip.modified_date,
-        tags: clip.tags,
-        thumbnail: clip.thumbnail,
-        proxy: clip.proxy,
-        o_pxy_id: clip.o_pxy_id,
-        o_asset_type: clip.o_asset_type,
-        format_uid: clip.format_uid,
-        a_owner_uid: clip.a_owner_uid,
-        a_groups: clip.a_groups,
-        a_users: clip.a_users,
-        h_main_origin_uid: clip.h_main_origin_uid,
-        h_origins: clip.h_origins,
-        license: clip.license,
-        restored_count: clip.restored_count
-    }
-    clips_model.insert(new_clip)
-    .then(function(val) {
-        res.json(val);
-    });
-}
-
 module.exports = {
     addClip,
+    findClip,
     listClips
 }

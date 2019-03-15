@@ -100,10 +100,21 @@ function getParams(req) {
 
 }
 
+/**
+ * Find a property in object
+ * @param {*} keyname Name of Property to find.
+ * @param {Object} obj Object to find property.
+ * @returns {bool} True if exists, Flase if not exists
+ */
+function keyExists(keyname, obj) {
+  return Object.keys(obj).includes(keyname);
+}
+
 module.exports = {
   getDateTime,
   getDateTimeDb,
   getParams,
-  getReturnData
+  getReturnData,
+  keyExists
 
 };
