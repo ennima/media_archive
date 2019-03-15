@@ -47,25 +47,44 @@ function find(origin_uid) {
  * @param {String} status Status
  * @returns {Promise} Promise with data or error
  */
-function insert(name, description, ftp, ftp_user, ftp_pass, ftp_host, cif, cif_user, cif_pass, cif_host, site_uid, capacity_bytes, capacity_used, capacity_free, status) {
+function insert(origin) {
+
+  const new_origin = {
+      'name': origin.name,
+      'description': origin.description,
+      'ftp': origin.ftp,
+      'ftp_user': origin.ftp_user,
+      'ftp_pass': origin.ftp_pass,
+      'ftp_host': origin.ftp_host,
+      'cif': origin.cif,
+      'cif_user': origin.cif_user,
+      'cif_pass': origin.cif_pass,
+      'cif_host': origin.cif_host,
+      'site_uid': origin.site_uid,
+      'capacity_bytes': origin.capacity_bytes,
+      'capacity_used': origin.capacity_used,
+      'capacity_free': origin.capacity_free,
+      'status': origin.status
+  };
+
   return db.runQuery(`INSERT INTO media_archive.origins
         (name, description, ftp, ftp_user, ftp_pass, ftp_host, cif, cif_user, cif_pass, cif_host, site_uid, capacity_bytes, capacity_used, capacity_free, status)
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
-        name,
-        description,
-        ftp,
-        ftp_user,
-        ftp_pass,
-        ftp_host,
-        cif,
-        cif_user,
-        cif_pass,
-        cif_host,
-        site_uid,
-        capacity_bytes,
-        capacity_used,
-        capacity_free,
-        status
+        new_origin.name,
+        new_origin.description,
+        new_origin.ftp,
+        new_origin.ftp_user,
+        new_origin.ftp_pass,
+        new_origin.ftp_host,
+        new_origin.cif,
+        new_origin.cif_user,
+        new_origin.cif_pass,
+        new_origin.cif_host,
+        new_origin.site_uid,
+        new_origin.capacity_bytes,
+        new_origin.capacity_used,
+        new_origin.capacity_free,
+        new_origin.status
       ]);
 }
 
