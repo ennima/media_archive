@@ -1,0 +1,4 @@
+ffprobe -select_streams v -i milenio_m_s.mp4 -show_entries "frame=pkt_pts_time,pkt_duration_time,interlaced_frame" -pretty -print_format json -of json > TEST_GXF.json
+
+
+ffprobe -v error -show_entries stream=width,height,bit_rate,duration,frame=interlaced_frame  -of default=noprint_wrappers=1 milenio_m_s.mp4

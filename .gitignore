@@ -1,0 +1,12 @@
+__pycache__
+ffmpeg_bin
+mediainfo_bin
+node_modules
+package-lock.json
+.exe
+.env
+.mov
+.mp4
+.mxf
+.cmf
+.gxf
