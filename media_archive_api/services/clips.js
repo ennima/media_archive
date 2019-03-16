@@ -1,8 +1,6 @@
-const clips_model = require('../models/mysql/clips')
-
-
 var moment = require('moment');
 
+const clips_model = require('../models/mysql/clips')
 const {keyExists} = require('../utils/common');
 
 const date_format_store = 'YYYY-MM-DD H:mm:ss';
@@ -91,6 +89,7 @@ async function listClips(req, res){
         const stored_clips = Object.keys(val).map(function(key){
             
             const new_clip = {
+                clip_uid: val[key].clip_uid,
                 name: val[key].name,
                 size_bytes: val[key].size_bytes,
                 duration: val[key].duration,
@@ -110,7 +109,9 @@ async function listClips(req, res){
                 h_main_origin_uid: val[key].h_main_origin_uid,
                 h_origins: val[key].h_origins,
                 license: val[key].license,
-                restored_count: val[key].restored_count
+                restored_count: val[key].restored_count,
+                format_name:val[key].format_name,
+                extension:val[key].extension
             }
             return new_clip;
         });
@@ -120,8 +121,20 @@ async function listClips(req, res){
     });
 }
 
+async function addOriginReplicant(req, res){
+    const data = req.body;
+    const first_key = Object.keys(data)[0];
+    const clip_uid = req.params.clip_uid;
+
+    clips_model.updateCol(clip_uid, first_key, data[first_key])
+    .then(val=>{
+        res.send(val)
+    })
+}
+
 module.exports = {
     addClip,
+    addOriginReplicant,
     findClip,
     listClips
 }

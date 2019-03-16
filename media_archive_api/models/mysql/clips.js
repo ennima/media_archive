@@ -22,8 +22,9 @@ function count() {
  * @returns {Promise} Promise with data or error
  */
 function find(clip_uid) {
-  return db.runQuery(`SELECT * FROM media_archive.clips
-      WHERE media_archive.clips.clip_uid = ?;`, [clip_uid]);
+  return db.runQuery(`SELECT cl.*, cf.name as format_name, cf.extension
+  FROM media_archive.clips as cl INNER JOIN media_archive.c_formats as cf
+  WHERE cl.clip_uid = ? AND cl.format_uid = cf.c_formats_uid;`, [clip_uid]);
 }
 
 /**
@@ -33,8 +34,9 @@ function find(clip_uid) {
  * @returns {Promise} Promise with data or error
  */
 function findKey(key, val) {
-  return db.runQuery(`SELECT * FROM media_archive.clips
-      WHERE media_archive.clips.${key} LIKE '%${val}%';`);
+  return db.runQuery(`SELECT cl.*, cf.name as format_name, cf.extension
+   FROM media_archive.clips as cl INNER JOIN media_archive.c_formats as cf
+  WHERE cl.${key} LIKE '%${val}%'AND cl.format_uid = cf.c_formats_uid;`);
 }
 
 /**
@@ -44,34 +46,15 @@ function findKey(key, val) {
  * @returns {Promise} Promise with data or error
  */
 function findKeyStrict(key, val) {
-  return db.runQuery(`SELECT * FROM media_archive.clips
-      WHERE media_archive.clips.${key} LIKE ?;`, [val]);
+  return db.runQuery(`SELECT cl.*, cf.name as format_name, cf.extension 
+   FROM media_archive.clips as cl INNER JOIN media_archive.c_formats as cf 
+   WHERE cl.${key} LIKE ? AND cl.format_uid = cf.c_formats_uid;`, [val]);
 }
 
 
 /**
  * Insert Clip
- * @param {String} clip_uid Clips uid
- * @param {String} name Name
- * @param {String} size_bytes Size bytes
- * @param {String} duration Duration
- * @param {String} aspect Aspect
- * @param {String} size_screen Size screen
- * @param {String} created_date Created date
- * @param {String} modified_date Modified date
- * @param {String} tags Tags
- * @param {String} thumbnail Thumbnail
- * @param {String} proxy Proxy
- * @param {String} o_pxy_id O pxy id
- * @param {String} o_asset_type O asset type
- * @param {String} format_uid Format uid
- * @param {String} a_owner_uid A owner uid
- * @param {String} a_groups A groups
- * @param {String} a_users A users
- * @param {String} h_main_origin_uid H main origin uid
- * @param {String} h_origins H origins
- * @param {String} license License
- * @param {String} restored_count Restored count
+ * @param {String} clip Clip data.
  * @returns {Promise} Promise with data or error
  */
 function insert(clip) {
@@ -108,7 +91,9 @@ function insert(clip) {
  * @returns {Promise} Promise with data or error
  */
 function list() {
-  return db.runQuery('SELECT * FROM media_archive.clips;', []);
+  return db.runQuery(`SELECT cl.*, cf.name as format_name, cf.extension 
+  FROM media_archive.clips as cl INNER JOIN media_archive.c_formats as cf 
+  WHERE cl.format_uid = cf.c_formats_uid;`, []);
 }
 
 
