@@ -59,8 +59,8 @@ function findKeyStrict(key, val) {
  */
 function insert(clip) {
   return db.runQuery(`INSERT INTO media_archive.clips
-        (name, size_bytes, duration, aspect, size_screen, created_date, modified_date, tags, thumbnail, proxy, o_pxy_id, o_asset_type, format_uid, a_owner_uid, a_groups, a_users, h_main_origin_uid, h_origins, license, restored_count)
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
+        (name, size_bytes, duration, aspect, size_screen, created_date, modified_date, tags, thumbnail, proxy, o_pxy_id, o_asset_type, format_uid, a_owner_uid, a_groups, a_users, h_main_origin_uid, h_origins, license, restored_count, path)
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
           clip.name,
           clip.size_bytes,
           clip.duration,
@@ -80,7 +80,8 @@ function insert(clip) {
           clip.h_main_origin_uid,
           clip.h_origins,
           clip.license,
-          clip.restored_count
+          clip.restored_count,
+          clip.path
           ]
          );
 }
@@ -135,7 +136,7 @@ function remove(clip_uid) {
  */
 function update(clip_uid, name, size_bytes, duration, aspect, size_screen, created_date, modified_date, tags, thumbnail, proxy, o_pxy_id, o_asset_type, format_uid, a_owner_uid, a_groups, a_users, h_main_origin_uid, h_origins, license, restored_count) {
   return db.runQuery(`UPDATE media_archive.clips
-    SET clip_uid = ?, name = ?, size_bytes = ?, duration = ?, aspect = ?, size_screen = ?, created_date = ?, modified_date = ?, tags = ?, thumbnail = ?, proxy = ?, o_pxy_id = ?, o_asset_type = ?, format_uid = ?, a_owner_uid = ?, a_groups = ?, a_users = ?, h_main_origin_uid = ?, h_origins = ?, license = ?, restored_count = ?
+    SET clip_uid = ?, name = ?, size_bytes = ?, duration = ?, aspect = ?, size_screen = ?, created_date = ?, modified_date = ?, tags = ?, thumbnail = ?, proxy = ?, o_pxy_id = ?, o_asset_type = ?, format_uid = ?, a_owner_uid = ?, a_groups = ?, a_users = ?, h_main_origin_uid = ?, h_origins = ?, license = ?, restored_count = ?, path = ?
     WHERE media_archive.clips.clip_uid = ?;`, [
     clip_uid,
     name,
@@ -158,7 +159,8 @@ function update(clip_uid, name, size_bytes, duration, aspect, size_screen, creat
     h_origins,
     license,
     restored_count,
-    clip_uid
+    clip_uid,
+    path
   ]);
 }
 

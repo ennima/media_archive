@@ -10,6 +10,6 @@ router.get('/find', clips_ctrl.findClip);
 
 router.post('/', clips_ctrl.addClip);
 
-router.patch('/:clip_uid', clips_ctrl.addOriginReplicant);
+router.patch('/', clips_ctrl.changeProp);
 
 module.exports = router;

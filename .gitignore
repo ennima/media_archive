@@ -3,6 +3,7 @@ ffmpeg_bin
 mediainfo_bin
 node_modules
 package-lock.json
+Thumbs.db
 .exe
 .env
 .mov

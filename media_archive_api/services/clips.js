@@ -56,7 +56,8 @@ async function addClip(req, res){
         h_main_origin_uid: clip.h_main_origin_uid,
         h_origins: clip.h_origins,
         license: clip.license,
-        restored_count: clip.restored_count
+        restored_count: clip.restored_count,
+        path: clip.path
     }
     clips_model.insert(new_clip)
     .then(function(val) {
@@ -111,7 +112,8 @@ async function listClips(req, res){
                 license: val[key].license,
                 restored_count: val[key].restored_count,
                 format_name:val[key].format_name,
-                extension:val[key].extension
+                extension:val[key].extension,
+                path: val[key].path
             }
             return new_clip;
         });
@@ -121,20 +123,25 @@ async function listClips(req, res){
     });
 }
 
-async function addOriginReplicant(req, res){
+async function changeProp(req, res){
     const data = req.body;
-    const first_key = Object.keys(data)[0];
-    const clip_uid = req.params.clip_uid;
+    const clip_uid = data.clip_uid;
+    delete data.clip_uid
 
-    clips_model.updateCol(clip_uid, first_key, data[first_key])
+    const key_replace = Object.keys(data)[0];
+    console.log(data, clip_uid, key_replace)
+   
+    clips_model.updateCol(clip_uid, key_replace, data[key_replace])
     .then(val=>{
         res.send(val)
+    }).catch(err=>{
+        res.send(err)
     })
 }
 
 module.exports = {
     addClip,
-    addOriginReplicant,
+    changeProp,
     findClip,
     listClips
 }
