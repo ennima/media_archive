@@ -22,8 +22,8 @@ class VideoMetadata:
 	video_codec = "empty"
 	video_color_space = "empty"
 	video_color_chroma_subsamplig ="empty"
-	video_Width = "empty"
-	video_Height = "empty"
+	video_Width = "0"
+	video_Height = "0"
 	video_frame_rate = "empty"
 	video_scan_type ="empty"
 	video_bit_depth ="empty"
@@ -52,14 +52,18 @@ class VideoMetadata:
 
 	def get_ffmpeg_dimensions(self, dimension):
 		dimensions_split = dimension.split(" ")
-		#print(dimensions_split)
+		print("dimensions_split:",dimensions_split)
+		
 		dimensions = dimensions_split[0].split("x")
-		#print("#DIMENSIONS: ",dimensions)
-		self.video_Width = dimensions[0]
-		self.video_Height = dimensions[1]
+		if(len(dimensions)>1):
+			#print("#DIMENSIONS: ",dimensions)
+			self.video_Width = dimensions[0]
+			self.video_Height = dimensions[1]
 
 
 	def get_aspect_ratio(self,width, height):
+
+		print("width:",width," height:",height)
 		aspect_ratio = "empty"
 		aspect_dec = width/height
 		aspect_dec_l = "{0:.2f}".format(aspect_dec)
@@ -104,7 +108,7 @@ class VideoMetadata:
 		count_audio = 0
 
 		for data in text:
-			#print(data)
+			print(data)
 
 			if("Metadata:" in data):
 				info_metadata = True
@@ -132,7 +136,7 @@ class VideoMetadata:
 			
 			if("Video:" in data):
 				data_split = data.strip().split(",")
-				#print(data_split)
+				print(data_split)
 				video_codec_split = data_split[0].split("Video: ")
 				#print(video_codec_split[1])
 				
@@ -160,11 +164,22 @@ class VideoMetadata:
 							#print("chroma: ", chroma)
 							if(self.video_color_chroma_subsamplig == "empty"):
 								self.video_color_chroma_subsamplig = chroma[0]
-					#print("### NEXT: ",data_split[3])
-					if(self.video_Width == "empty"):
+
+					print("### NEXT: ",data_split[3])
+					if("[SAR" in data_split[3]):
+						data_split[3] = data_split[3].strip().split(" ")[0]
+						print("---",data_split[3])
+					else:
+						print("COQE")
+
+
+					if(self.video_Width == "0"):
+						print("GETTING DIMENSIONS")
 						self.get_ffmpeg_dimensions(data_split[3].strip())
+
 					
-					if(self.video_aspect_ratio == "empty"):
+					elif(self.video_aspect_ratio == "empty"):
+							
 						self.get_aspect_ratio(int(self.video_Width), int(self.video_Height))
 					
 					fps_split = data_split[4].strip().split(" ")

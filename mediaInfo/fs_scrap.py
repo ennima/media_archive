@@ -29,7 +29,6 @@ storage_origin_file = "istorage_srvr"
 dirs_to_scrap1 = ["Main"]
 # dirs_to_scrap1 = "all"
 
-
 origin_uid = -1
 
 if(os.path.exists(os.path.join(videos_path,storage_origin_file))):

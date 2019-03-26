@@ -10,11 +10,33 @@ def VideoMetadataDate2Mysql(ffmpeg_date):
 	date_time_obj = datetime.strptime(date_time_str, '%d/%m/%Y %H:%M')
 	return date_time_obj.strftime("%Y-%m-%d %H:%M:%S")
 
-def findClip(clip_name, endpoint):
+def findLog(clip_name, endpoint):
+	print(" Findlog Endpoint:", endpoint)
+	new_transaction = {
+		"clip_uid":0,
+		"action": "Find",
+		"user_uid":1,
+		"host_uid":0,
+		"app_uid":3,
+		"description":clip_name
+	}
+
+	try:
+		req = requests.post(endpoint,data=new_transaction).json()
+	except Exception as e:
+		print(e)
+		return False
+		# raise e
+	else:
+		# print(req)
+		return req
+
+def findClip(clip_name, end_base, endpoint):
 
 	data = {"name":clip_name,"mode":"strict"}
+	findLog(clip_name,end_base + "/transactions")
 	try:
-		req = requests.get(endpoint,data=data).json()
+		req = requests.get(end_base+endpoint,data=data).json()
 	except Exception as e:
 		print(e)
 		return False
@@ -24,23 +46,72 @@ def findClip(clip_name, endpoint):
 		return req
 
 
-def saveClip(clip, endpoint):
+def saveLog(clip_uid, clip_name, endpoint):
+	print(" INDEXLOG Endpoint:", endpoint)
+	new_transaction = {
+		"clip_uid":clip_uid,
+		"action": "Indexing",
+		"user_uid":1,
+		"host_uid":0,
+		"app_uid":3,
+		"description":clip_name
+	}
+
 	try:
-		req = requests.post(endpoint,data=clip).json()
+		req = requests.post(endpoint,data=new_transaction).json()
 	except Exception as e:
 		print(e)
 		return False
+		# raise e
 	else:
+		# print(req)
 		return req
 
-def updateClip(clip_prop, endpoint):
+def saveClip(clip, end_base, endpoint):
 	try:
-		req = requests.patch(endpoint,data=clip_prop).json()
+		req = requests.post(end_base+endpoint,data=clip).json()
 	except Exception as e:
 		print(e)
 		return False
 	else:
+		print("---REQ: ",req)
+		saveLog(req["insertId"], clip["name"], end_base+"/transactions")
 		return req
+
+
+def updateLog(clip_uid, prop_name, endpoint):
+	print(" Updating Endpoint:", endpoint)
+	new_transaction = {
+		"clip_uid":clip_uid,
+		"action": "Update",
+		"user_uid":1,
+		"host_uid":0,
+		"app_uid":3,
+		"description":prop_name
+	}
+
+	try:
+		req = requests.post(endpoint,data=new_transaction).json()
+	except Exception as e:
+		print(e)
+		return False
+		# raise e
+	else:
+		# print(req)
+		return req
+
+
+def updateClip(clip_prop, e_base, endpoint):
+	updateLog(clip_prop["clip_uid"], "h_origins: "+clip_prop["h_origins"], e_base+"/transactions")
+	try:
+		req = requests.patch(e_base+endpoint,data=clip_prop).json()
+	except Exception as e:
+		print(e)
+		return False
+	else:
+
+		return req
+
 
 def getClipMetadata(clip_path, format_uid, rel_path):
 
@@ -86,7 +157,7 @@ def getClipMetadata(clip_path, format_uid, rel_path):
 	return new_clip
 
 
-def isReplicated(clip_existente_x, nuevo_clip_x, origin_uid):
+def isReplicated(clip_existente_x, nuevo_clip_x, origin_uid, e_bas):
 	result = False
 	
 	if(clip_existente_x["h_main_origin_uid"] == origin_uid):
@@ -105,32 +176,32 @@ def isReplicated(clip_existente_x, nuevo_clip_x, origin_uid):
 						"clip_uid":clip_existente_x["clip_uid"],
 						"h_origins":json.dumps(js)
 						}
-			upd = updateClip(new_prop, "http://127.0.0.1:3006/clips")
+			upd = updateClip(new_prop, e_bas, "/clips")
 	return result
 		
 
-def processSingleClip(clip_existente_s,nuevo_clip_s, origin_uid_s):
+def processSingleClip(clip_existente_s,nuevo_clip_s, origin_uid_s, e_base):
 	if('result' in clip_existente_s.keys()):
 			print("No existe ", nuevo_clip_s["name"]," en el sistema.")
-			print(saveClip(nuevo_clip_s, "http://127.0.0.1:3006/clips"))
+			print(saveClip(nuevo_clip_s, e_base,"/clips"))
 	else:
 		print("Existe")
 		# print("Ext:",clip_existente_s)
 		if(clip_existente_s["extension"] == nuevo_clip_s["extension"]):
 
 			print("Duplicado")
-			isReplicated(clip_existente_s, nuevo_clip_s, origin_uid_s)
+			isReplicated(clip_existente_s, nuevo_clip_s, origin_uid_s, e_base)
 				
 		else:
 			print("Nuevo Formato")
-			print(saveClip(nuevo_clip_s, "http://127.0.0.1:3006/clips"))
+			print(saveClip(nuevo_clip_s, e_base,"/clips"))
 	
 
-def processClip(clip_existente,nuevo_clip, origin_uid_c):
+def processClip(clip_existente,nuevo_clip, origin_uid_c, end_ba):
 	print(type(clip_existente))
 	if(type(clip_existente) == dict):
 
-		processSingleClip(clip_existente,nuevo_clip, origin_uid_c)
+		processSingleClip(clip_existente,nuevo_clip, origin_uid_c, end_ba)
 		
 	else:
 		existe_formats = []
@@ -144,33 +215,121 @@ def processClip(clip_existente,nuevo_clip, origin_uid_c):
 			for item in clip_existente:
 				print(item["format_uid"])
 				if(nuevo_clip["format_uid"] == item["format_uid"]):
-					isReplicated(item, nuevo_clip, origin_uid_c)
+					isReplicated(item, nuevo_clip, origin_uid_c, end_ba)
 					pass
 
 			
 		else:
 			print("Nuevo Formato, que guay.")
-			processSingleClip(clip_existente[0],nuevo_clip, origin_uid_c)
+			processSingleClip(clip_existente[0],nuevo_clip, origin_uid_c, end_ba)
 
 
-clips_index = ["ALFOMBRA GENERAL-VO_DF007W64.gxf","ALFOMBRA YALITZA-BITE_DF007WA4.gxf","21H ROMA OSCAR-FT_DF007QCD.gxf"]
+def validClip(root, file, origin_uid_c):
+	result = False
+	video_extensions = ['.gxf','.mov', '.asf', '.mp4', '.mxf', '.cmf']
+	print("---validClip:",file)
+	extension = file[-4:]
+	rel_path = root[2:]
+	print("   Ext:", extension)
+	print("   path:", rel_path)
+	format_uid = 0
+	if(str.upper(extension) == str.upper('.gxf')):
+		format_uid = 1
+	else:
+		format_uid = 0
+
+	if(extension in video_extensions):
+
+		result = True
+		print("Es un VIdeo")
+		new_clip = getClipMetadata(os.path.join(root, file), format_uid, rel_path)
+		new_clip["h_main_origin_uid"] = origin_uid_c
+		new_clip["h_origins"] = '[{0}]'.format(origin_uid_c)
+		
+		endpoint = "/clips/find"
+
+		clip_existe = findClip(new_clip["name"],endpoint_base,endpoint)
+
+		processClip(clip_existe,new_clip, origin_uid_c, endpoint_base)
+
+	return result
+
+
+def scrapFs(videos_path_1,dirs_to_scrap, origin_uid_c):
+	curr_dir = "--"
+	clip_counter = 0
+	indexado = 0
+	indexed_clips = 0
+	for root, dirs, files in os.walk(videos_path_1):
+		
+		for file in files:
+			clip_counter += 1
+			if(dirs_to_scrap == "all"):
+				if(validClip(root, file, origin_uid_c)):
+					indexed_clips += 1
+			else:
+				if(dirs_to_scrap[0] in root):
+					
+					curr_dir = dirs_to_scrap[0]
+					print("---- Clip:",file)
+					print(os.path.join(root,file))
+					if(validClip(root, file, origin_uid_c)):
+						indexed_clips += 1
+					indexado = 1
+
+				else:
+					curr_dir = "-/-/-/"
+					if(indexado):
+						print("BOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+						break
+	return {"indexed_clips":indexed_clips,"clip_counter":clip_counter}
+
+
+
+
+endpoint_base = "http://127.0.0.1:3006"
+# videos_path = "C:\\Users\\ennima\\Documents\\Develops 2018\\Milenio\\restore_app\\mediaInfo\\"
+videos_path = "U:\\"
+storage_origin_file = "istorage_srvr"
+# dirs_to_scrap1 = ["AFICION"]
+dirs_to_scrap1 = "all"
+
+origin_uid = -1
+if(os.path.exists(os.path.join(videos_path,storage_origin_file))):
+	print("Hay Origen")
+	with open(os.path.join(os.path.join(videos_path,storage_origin_file))) as id_file:
+		origin_uid = int(id_file.read())
+else:
+	print("Origen Desconocido")
+
+
+# clips_index = ["ALFOMBRA GENERAL-VO_DF007W64.gxf","ALFOMBRA YALITZA-BITE_DF007WA4.gxf","21H ROMA OSCAR-FT_DF007QCD.gxf"]
 # clips_index = ["ALFOMBRA YALITZA-BITE_DF007WA4.gxf"]
-path = "R:\\VB2017\\HEY\\"
-origin_uid = 9
+# path = "R:\\VB2017\\HEY\\"
+# origin_uid = 9
 
 
 time_metric = TimeMetrics()
 time_metric.init()
-for item in clips_index:
-	new_clip = getClipMetadata(os.path.join(path,item),1,"\\HH\\LLLL")
-	new_clip["h_main_origin_uid"] = origin_uid
-	new_clip["h_origins"] = '[{0}]'.format(origin_uid)
-	
-	endpoint = "http://127.0.0.1:3006/clips/find"
 
-	clip_existe = findClip(new_clip["name"],endpoint)
+srap_fs = scrapFs(videos_path,dirs_to_scrap1, origin_uid)
+
+
+# print(getClipMetadata("R:\\VB2017\\AFICION\\ABIERTO AUSTRALIA-VO_DF007OOS.gxf", "00", "test"))
+
+# print(getClipMetadata("R:\\VB2017\\HEY\\21H ROMA OSCAR-FT_DF007QCD.gxf", "00", "test"))
+
+print("Origin:",origin_uid, "Total CLips:",srap_fs["clip_counter"], "indexed_clips:",srap_fs["indexed_clips"])
+# for item in clips_index:
+# 	new_clip = getClipMetadata(os.path.join(path,item),1,"\\HH\\LLLL")
+# 	new_clip["h_main_origin_uid"] = origin_uid
+# 	new_clip["h_origins"] = '[{0}]'.format(origin_uid)
 	
-	processClip(clip_existe,new_clip, origin_uid)
+# 	endpoint = "/clips/find"
+
+# 	clip_existe = findClip(new_clip["name"],endpoint_base,endpoint)
+
+# 	processClip(clip_existe,new_clip, origin_uid, endpoint_base)
 
 print(time_metric.get_elapsed_time())
 	
