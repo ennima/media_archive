@@ -116,8 +116,8 @@ def updateClip(clip_prop, e_base, endpoint):
 def getClipMetadata(clip_path, format_uid, rel_path):
 
 	meta = VideoMetadata(clip_path)
-	meta.path_media_info = "C:\\Users\\ennima\\Documents\\Develops 2018\\Milenio\\restore_app\\mediaInfo\\mediainfo_bin\\MediaInfo.exe"
-	meta.path_ffmpeg = "C:\\Users\\ennima\\Documents\\Develops 2018\\Milenio\\restore_app\\mediaInfo\\ffmpeg_bin\\ffprobe.exe"
+	meta.path_media_info = "C:\\Users\\GVadmin\\Documents\\develops 2017\\Milenio\\media_archive\\mediaInfo\\mediainfo_bin\\MediaInfo.exe"
+	meta.path_ffmpeg = "C:\\Users\\GVadmin\\Documents\\develops 2017\\Milenio\\media_archive\\mediaInfo\\ffmpeg_bin\\ffprobe.exe"
 
 	time_metric = TimeMetrics()
 	time_metric.init()
@@ -227,7 +227,7 @@ def processClip(clip_existente,nuevo_clip, origin_uid_c, end_ba):
 def validClip(root, file, origin_uid_c):
 	result = False
 	video_extensions = ['.gxf','.mov', '.asf', '.mp4', '.mxf', '.cmf']
-	print("---validClip:",file)
+	print("---validClip:",file.encode("utf-8"))
 	extension = file[-4:]
 	rel_path = root[2:]
 	print("   Ext:", extension)
@@ -241,7 +241,8 @@ def validClip(root, file, origin_uid_c):
 	if(extension in video_extensions):
 
 		result = True
-		print("Es un VIdeo")
+		print("Es un VIdeo:",file.encode("utf-8"))
+		print("---- Path: ",os.path.join(root,file).encode("utf-8"))
 		new_clip = getClipMetadata(os.path.join(root, file), format_uid, rel_path)
 		new_clip["h_main_origin_uid"] = origin_uid_c
 		new_clip["h_origins"] = '[{0}]'.format(origin_uid_c)
@@ -265,14 +266,15 @@ def scrapFs(videos_path_1,dirs_to_scrap, origin_uid_c):
 		for file in files:
 			clip_counter += 1
 			if(dirs_to_scrap == "all"):
-				if(validClip(root, file, origin_uid_c)):
-					indexed_clips += 1
+				if(os.path.exists(os.path.join(root, file))):
+					if(validClip(root, file, origin_uid_c)):
+						indexed_clips += 1
 			else:
 				if(dirs_to_scrap[0] in root):
 					
 					curr_dir = dirs_to_scrap[0]
-					print("---- Clip:",file)
-					print(os.path.join(root,file))
+					print("---- Clip:",file.encode("utf-8"))
+					print(os.path.join(root,file.encode("utf-8")))
 					if(validClip(root, file, origin_uid_c)):
 						indexed_clips += 1
 					indexado = 1
@@ -289,7 +291,7 @@ def scrapFs(videos_path_1,dirs_to_scrap, origin_uid_c):
 
 endpoint_base = "http://127.0.0.1:3006"
 # videos_path = "C:\\Users\\ennima\\Documents\\Develops 2018\\Milenio\\restore_app\\mediaInfo\\"
-videos_path = "U:\\"
+videos_path = "R:\\"
 storage_origin_file = "istorage_srvr"
 # dirs_to_scrap1 = ["AFICION"]
 dirs_to_scrap1 = "all"
@@ -299,6 +301,7 @@ if(os.path.exists(os.path.join(videos_path,storage_origin_file))):
 	print("Hay Origen")
 	with open(os.path.join(os.path.join(videos_path,storage_origin_file))) as id_file:
 		origin_uid = int(id_file.read())
+		print("origin_uid:",origin_uid)
 else:
 	print("Origen Desconocido")
 
