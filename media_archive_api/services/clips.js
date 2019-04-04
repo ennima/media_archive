@@ -124,6 +124,7 @@ async function listClips(req, res){
 }
 
 async function changeProp(req, res){
+    console.log("PATCHING ---------");
     const data = req.body;
     const clip_uid = data.clip_uid;
     delete data.clip_uid

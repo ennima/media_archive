@@ -113,6 +113,17 @@ def updateClip(clip_prop, e_base, endpoint):
 		return req
 
 
+def updateClipProp(clip_prop, key_name, e_base, endpoint):
+	updateLog(clip_prop["clip_uid"], key_name+": "+clip_prop[key_name], e_base+"/transactions")
+	try:
+		req = requests.patch(e_base+endpoint,data=clip_prop).json()
+	except Exception as e:
+		print(e)
+		return False
+	else:
+
+		return req
+
 def getClipMetadata(clip_path, format_uid, rel_path):
 
 	meta = VideoMetadata(clip_path)
@@ -250,6 +261,16 @@ def validClip(root, file, origin_uid_c):
 		endpoint = "/clips/find"
 
 		clip_existe = findClip(new_clip["name"],endpoint_base,endpoint)
+		if(clip_existe['path'] == None):
+			print("Update Path to:",rel_path," ClipID:",clip_existe['clip_uid'])
+			new_prop = {
+						"clip_uid":clip_existe['clip_uid'],
+						"path":rel_path
+						}
+			update_clip_prop = updateClipProp(new_prop, "path", endpoint_base, "/clips")
+			print(update_clip_prop)
+		else:
+			("Path OK")
 
 		processClip(clip_existe,new_clip, origin_uid_c, endpoint_base)
 
@@ -273,11 +294,13 @@ def scrapFs(videos_path_1,dirs_to_scrap, origin_uid_c):
 				if(dirs_to_scrap[0] in root):
 					
 					curr_dir = dirs_to_scrap[0]
+					print("---- Pathpr:",root)
 					print("---- Clip:",file.encode("utf-8"))
-					print(os.path.join(root,file.encode("utf-8")))
+					print(os.path.join(root,file))
 					if(validClip(root, file, origin_uid_c)):
 						indexed_clips += 1
 					indexado = 1
+					break
 
 				else:
 					curr_dir = "-/-/-/"
@@ -290,11 +313,11 @@ def scrapFs(videos_path_1,dirs_to_scrap, origin_uid_c):
 
 
 endpoint_base = "http://127.0.0.1:3006"
-# videos_path = "C:\\Users\\ennima\\Documents\\Develops 2018\\Milenio\\restore_app\\mediaInfo\\"
+# videos_path = "Y:\\StratusArchive\\"
 videos_path = "R:\\"
 storage_origin_file = "istorage_srvr"
-# dirs_to_scrap1 = ["AFICION"]
-dirs_to_scrap1 = "all"
+dirs_to_scrap1 = ["XEN\\t_188161L6\\Archivo\\HEY"]
+# dirs_to_scrap1 = "all"
 
 origin_uid = -1
 if(os.path.exists(os.path.join(videos_path,storage_origin_file))):
