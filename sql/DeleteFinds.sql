@@ -1,0 +1,1 @@
+DELETE FROM media_archive.transactions WHERE media_archive.transactions.action = 'Find';

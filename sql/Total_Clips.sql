@@ -1,0 +1,1 @@
+SELECT count(*) FROM media_archive.clips;

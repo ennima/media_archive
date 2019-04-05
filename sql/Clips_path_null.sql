@@ -1,0 +1,1 @@
+SELECT count(*), h_main_origin_uid FROM media_archive.clips WHERE path IS NULL GROUP BY h_main_origin_uid;
