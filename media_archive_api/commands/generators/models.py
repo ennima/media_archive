@@ -29,22 +29,30 @@ def object_plural(schema):
 
 def insert_jsdoc(schema):
 	jsDoc_params = "/**\n" + " * Insert " + schema["object"] + "\n"
-	for item in schema["cols"]:
-		if(item.upper() == schema["object"].upper()):
-			jsDoc_params += " * @param {String} "+item+" {0} \n".format(item.capitalize()+" name")	
-		else:
-			jsDoc_params += " * @param {String} "+item+" {0} \n".format(item.replace("_"," ").capitalize())
+	jsDoc_params += " * @param {Object} "+schema["object"]+" Clip object whit data.\n"
+	# for item in schema["cols"]:
+	# 	if(item.upper() == schema["object"].upper()):
+	# 		jsDoc_params += " * @param {String} "+item+" {0} \n".format(item.capitalize()+" name")	
+	# 	else:
+	# 		jsDoc_params += " * @param {String} "+item+" {0} \n".format(item.replace("_"," ").capitalize())
 	jsDoc_params += " * @returns {Promise} Promise with data or error\n"
 	jsDoc_params += " */"
 	return jsDoc_params
 
 def insert_function(schema):
+	schema_object = schema["object"].lower()
+	
 	cols_str = arayToListString(schema["cols"])
 	cols_str_chr = arayToListString(schema["cols"],"?")
-	insert_template = "function insert({0}) ".format(cols_str)+"{\n" + "  return db.runQuery(`INSERT INTO {0}".format(schema["name"])
+	values = arayToListString([schema_object+"."+item+"\n" for item in schema["cols"]])
+	# print(values)
+
+	insert_template = "function insert({0}) ".format(schema_object)+"{\n" + "  return db.runQuery(`INSERT INTO {0}".format(schema["name"])
 	insert_template += "\n        ({0})".format(cols_str) + "\n"
-	insert_template += "        VALUES({0});`, [".format(cols_str_chr) + "\n        " +cols_str +"]);" + "\n}"
+	insert_template += "        VALUES({0});`, [".format(cols_str_chr) + "\n        " +values +"]);" + "\n}"
 	return insert_template
+
+
 
 def update_jsdoc(schema):
 	jsDoc_params = "/**\n" + " * Update " + schema["object"] + "\n"
@@ -227,21 +235,29 @@ if __name__ == '__main__':
 			}
 	}
 
-	module_name = object_plural(schema).lower() + ".js"
-	doc_title = "Model for {0} schema".format(object_plural(schema))
-	doc_string = module_jsdoc("Enrique Nieto Martínez",doc_title,1)
-	header = "const db = require('./db');" + "\n\n"
+	print(insert_jsdoc(schema))
+	print(insert_function(schema))
 
-	module_code = doc_string + header + print_functions(schema) + module_exports(schema)
-	# print(module_code)
+	# module_name = object_plural(schema).lower() + ".js"
+	# doc_title = "Model for {0} schema".format(object_plural(schema))
+	# doc_string = module_jsdoc("Enrique Nieto Martínez",doc_title,1)
+	# header = "const db = require('./db');" + "\n\n"
 
-	path_save = "..\\..\\models\\"
+	# module_code = doc_string + header + print_functions(schema) + module_exports(schema)
+	# # print(module_code)
 
-	dirname = os.path.dirname(__file__)
-	filename = os.path.join(dirname, path_save + module_name)
-	if os.path.exists(path_save):
-		print("existe Path")
-		print("saving: ",module_name)
-		with io.open(filename,'w',encoding='utf8') as f:
-			f.write(module_code)
+	# # path_save = "..\\..\\models\\"
+	# path_save = ".\\build\\"
+
+	# # MAC OS
+	# # path_save = "..//..//models//"
+	# # path_save = ".//build//"
+
+	# dirname = os.path.dirname(__file__)
+	# filename = os.path.join(dirname, path_save + module_name)
+	# if os.path.exists(path_save):
+	# 	print("existe Path")
+	# 	print("saving: ",module_name)
+	# 	with io.open(filename,'w',encoding='utf8') as f:
+	# 		f.write(module_code)
 
