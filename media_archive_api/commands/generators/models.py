@@ -29,24 +29,17 @@ def object_plural(schema):
 
 def insert_jsdoc(schema):
 	jsDoc_params = "/**\n" + " * Insert " + schema["object"] + "\n"
-	jsDoc_params += " * @param {Object} "+schema["object"]+" Clip object whit data.\n"
-	# for item in schema["cols"]:
-	# 	if(item.upper() == schema["object"].upper()):
-	# 		jsDoc_params += " * @param {String} "+item+" {0} \n".format(item.capitalize()+" name")	
-	# 	else:
-	# 		jsDoc_params += " * @param {String} "+item+" {0} \n".format(item.replace("_"," ").capitalize())
+	jsDoc_params += " * @param {Object} "+schema["object"]+" Clip object whit data.\n"	
 	jsDoc_params += " * @returns {Promise} Promise with data or error\n"
 	jsDoc_params += " */"
 	return jsDoc_params
 
 def insert_function(schema):
+	# Nombre del objeto a pasar
 	schema_object = schema["object"].lower()
-	
 	cols_str = arayToListString(schema["cols"])
 	cols_str_chr = arayToListString(schema["cols"],"?")
 	values = arayToListString([schema_object+"."+item+"\n" for item in schema["cols"]])
-	# print(values)
-
 	insert_template = "function insert({0}) ".format(schema_object)+"{\n" + "  return db.runQuery(`INSERT INTO {0}".format(schema["name"])
 	insert_template += "\n        ({0})".format(cols_str) + "\n"
 	insert_template += "        VALUES({0});`, [".format(cols_str_chr) + "\n        " +values +"]);" + "\n}"
@@ -66,12 +59,15 @@ def update_jsdoc(schema):
 	return jsDoc_params
 
 def update_function(schema):
+	# Nombre del objeto a pasar
+	schema_object = schema["object"].lower()
 	cols_str = arayToListString(schema["cols"])
 	cols_str_chr = arayToListString(schema["cols"],"?")
-	template = "function update({0}) ".format(cols_str)+"{\n" + "  return db.runQuery(`UPDATE {0}".format(schema["name"])
+	values = arayToListString([schema_object+"."+item+"\n" for item in schema["cols"]])
+	template = "function update({0}) ".format(schema_object)+"{\n" + "  return db.runQuery(`UPDATE {0}".format(schema["name"])
 	template += "\n    SET " + arayToListString(schema["cols"],"?",True) +"\n"
 	template += "    WHERE {0}.{1} = ?;`, [".format(schema["name"],schema["cols"][0]) +"\n"
-	template += "    "+cols_str +","+schema["cols"][0] + " ]);\n}"
+	template += "    "+values +","+schema["cols"][0] + " ]);\n}"
 	
 	return template
 
@@ -235,8 +231,8 @@ if __name__ == '__main__':
 			}
 	}
 
-	print(insert_jsdoc(schema))
-	print(insert_function(schema))
+	print(update_jsdoc(schema))
+	print(update_function(schema))
 
 	# module_name = object_plural(schema).lower() + ".js"
 	# doc_title = "Model for {0} schema".format(object_plural(schema))
