@@ -71,4 +71,4 @@ Muchas veces habrá que añadir más schemas al proyecto. Quizá necesitaremos i
 
 Los schemas con built serán omitidos por el generador.
 
-[Ejemplo de archivo schemas](./doc/schemas_example.json)
+[Ejemplo de archivo schemas](./schemas_example.json)
