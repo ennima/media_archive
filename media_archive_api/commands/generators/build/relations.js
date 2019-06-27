@@ -2,7 +2,7 @@
  * Model for Relations schema 
  * 
  * Developed by Enrique Nieto Martínez
- * 2019-06-26 21:28:12
+ * 2019-06-27 00:22:19
  */
 
 const db = require('./db');
@@ -24,6 +24,18 @@ function count() {
 function find( relation_uid ) {
   return db.runQuery(`SELECT * FROM media_archive.relations
       WHERE media_archive.relations.relation_uid = ?;`, [relation_uid]);
+}
+ 
+ 
+/**
+ * Find a Relation by Key, Value
+ * @param {String} key Key to find
+ * @param {String} val Value to find
+ * @returns {Promise} Promise with data or error
+ */
+function findKeyVal( key, value ) {
+  return db.runQuery(`SELECT * FROM media_archive.relations
+      WHERE media_archive.relations.${key} = ?;`, [value]);
 }
  
  
@@ -107,6 +119,7 @@ function updateCol(relation_uid, col_name, val) {
 module.exports = {
     count, 
     find, 
+    findKeyVal, 
     insert, 
     list, 
     remove, 

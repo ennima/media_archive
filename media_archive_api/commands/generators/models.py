@@ -132,6 +132,22 @@ def find_function(schema):
 
 	return template
 
+def findKeyVal_jsdoc(schema):
+	jsDoc_params = "/**\n" + " * Find a {0} by Key, Value".format(schema["object"].capitalize())+"\n"
+	jsDoc_params += " * @param {String}"+" {0} {1}\n".format("key", "Key to find")
+	jsDoc_params += " * @param {String}"+" {0} {1}\n".format("val", "Value to find")
+	jsDoc_params += " * @returns {Promise} Promise with data or error\n"
+	jsDoc_params += " */"
+	return jsDoc_params
+
+def find_functionKeyVal(schema):
+	print("KV")
+	template = "function findKeyVal( key, value ) {\n"
+	template += "  return db.runQuery(`SELECT * FROM {0}\n      WHERE {0}.{1} = ?;`, [{2}]);".format(schema["name"], "${key}", "value" ) +"\n"
+	template +="}"
+
+	return template
+
 def count_jsdoc(schema):
 	jsDoc_params = "/**\n" + " * Get a number of total {0}".format(schema["object"].lower()+"s")+"\n"
 	jsDoc_params += " * @returns {Promise} Promise with data or error\n"
@@ -203,6 +219,10 @@ def print_functions(schema):
 			code_string += find_jsdoc(schema) + "\n" 
 			code_string += find_function(schema)
 			code_string += function_interlineado
+		if(key.lower() == "findkeyval"):
+			code_string += findKeyVal_jsdoc(schema) + "\n" 
+			code_string += find_functionKeyVal(schema)
+			code_string += function_interlineado
 		if(key.lower() == "count"):
 			code_string += count_jsdoc(schema) + "\n" 
 			code_string += count_function(schema)
@@ -253,7 +273,7 @@ if __name__ == '__main__':
 
 	# MAC OS
 	# path_save = "..//..//models//"
-	# path_save = ".//build//"
+	path_save = ".//build//"
 	
 	for schema in schemas:
-		buildSchema(schema, ".\\build\\")
+		buildSchema(schema, path_save)

@@ -24,6 +24,7 @@
 			"update":"update",
 			"insert":"insert",
 			"find":"find",
+			"findKeyVal":"findKeyVal",
 			"count":"count",
 			"updatecol":"updateCol"
 		}			
