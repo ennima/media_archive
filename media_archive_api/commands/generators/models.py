@@ -236,6 +236,12 @@ if __name__ == '__main__':
 	# print(module_code)
 
 	path_save = "..\\..\\models\\"
+	path_save = "..//..//models//"
+	# path_save = ".\\models_gen\\"
+	path_save = ".//models_gen//"
+	print(path_save)
+	print(os.path.exists(path_save))
+
 
 	dirname = os.path.dirname(__file__)
 	filename = os.path.join(dirname, path_save + module_name)
