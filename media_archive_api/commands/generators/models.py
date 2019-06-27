@@ -269,11 +269,11 @@ if __name__ == '__main__':
 
 	# WINDOWS
 	# path_save = "..\\..\\models\\"
-	# path_save = ".\\build\\"
+	path_save = ".\\build\\"
 
 	# MAC OS
 	# path_save = "..//..//models//"
-	path_save = ".//build//"
+	# path_save = ".//build//"
 	
 	for schema in schemas:
 		buildSchema(schema, path_save)
