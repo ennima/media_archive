@@ -69,4 +69,6 @@ Realiza una búsqueda dentro de la tabla tomado el campo Id como criterio de bú
 #### built
 Muchas veces habrá que añadir más schemas al proyecto. Quizá necesitaremos indicar que no vuelva a compilar algunos schemas. Pará ello basta con agregar la propiedad built.
 
-Los schemas con built serán omitidos por el generador. 
+Los schemas con built serán omitidos por el generador.
+
+[Ejemplo de archivo schemas](/doc/schemas_example.json)
