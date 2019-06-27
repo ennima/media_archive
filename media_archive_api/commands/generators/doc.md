@@ -44,29 +44,29 @@ La sintaxis para describir dichas funciones es:
 
 ##### Tipos de funciones
 
-**list**
+##### **list**
 Entrega una lista de los registros dentro de la tabla.
 
-**remove**
+##### **remove**
 Elimina un ítem de la tabla
 
-**update**
+##### **update**
 Actualiza los valores de una fila en la tabla.
 
-**updatecol**
+##### **updatecol**
 Actualiza solamente un valor de la fila.
 
-**insert**
+##### **insert**
 Agrega un elemento a la tabla
 
-**count**
+##### **count**
 Entrega un entero con la cantidad de elementos en la tabla
 
-**find**
+##### **find**
 Realiza una búsqueda dentro de la tabla tomado el campo Id como criterio de búsqueda.
 
 
-#### built
+##### built
 Muchas veces habrá que añadir más schemas al proyecto. Quizá necesitaremos indicar que no vuelva a compilar algunos schemas. Pará ello basta con agregar la propiedad built.
 
 Los schemas con built serán omitidos por el generador. 
