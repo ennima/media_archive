@@ -1,4 +1,10 @@
-import os, collections
+##############################################################
+
+# Crea modelos que interactúan con una tabla de MySQL
+
+##############################################################
+
+import os, collections, json
 import io
 from datetime import datetime
 
@@ -29,44 +35,41 @@ def object_plural(schema):
 
 def insert_jsdoc(schema):
 	jsDoc_params = "/**\n" + " * Insert " + schema["object"] + "\n"
-	for item in schema["cols"]:
-		if(item.upper() == schema["object"].upper()):
-			jsDoc_params += " * @param {String} "+item+" {0} \n".format(item.capitalize()+" name")	
-		else:
-			jsDoc_params += " * @param {String} "+item+" {0} \n".format(item.replace("_"," ").capitalize())
+	jsDoc_params += " * @param {Object} "+schema["object"]+" Clip object whit data.\n"	
 	jsDoc_params += " * @returns {Promise} Promise with data or error\n"
 	jsDoc_params += " */"
 	return jsDoc_params
 
 def insert_function(schema):
+	# Nombre del objeto a pasar
+	schema_object = schema["object"].lower()
 	cols_str = arayToListString(schema["cols"])
 	cols_str_chr = arayToListString(schema["cols"],"?")
-	insert_template = "function insert({0}) ".format(cols_str)+"{\n" + "  return db.runQuery(`INSERT INTO {0}".format(schema["name"])
+	values = arayToListString([schema_object+"."+item+"\n" for item in schema["cols"]])
+	insert_template = "function insert({0}) ".format(schema_object)+"{\n" + "  return db.runQuery(`INSERT INTO {0}".format(schema["name"])
 	insert_template += "\n        ({0})".format(cols_str) + "\n"
-	insert_template += "        VALUES({0});`, [".format(cols_str_chr) + "\n        " +cols_str +"]);" + "\n}"
+	insert_template += "        VALUES({0});`, [".format(cols_str_chr) + "\n        " +values +"]);" + "\n}"
 	return insert_template
 
 def update_jsdoc(schema):
 	jsDoc_params = "/**\n" + " * Update " + schema["object"] + "\n"
-	for item in schema["cols"]:
-		if(item.upper() == schema["object"].upper()):
-			jsDoc_params += " * @param {String} "+item+" {0} \n".format(item.capitalize()+" name")	
-		else:
-			jsDoc_params += " * @param {String} "+item+" {0} \n".format(item.replace("_"," ").capitalize())
+	jsDoc_params += " * @param {Object} "+schema["object"]+" Clip object whit data.\n"	
 	jsDoc_params += " * @returns {Promise} Promise with data or error\n"
 	jsDoc_params += " */"
 	return jsDoc_params
 
 def update_function(schema):
+	# Nombre del objeto a pasar
+	schema_object = schema["object"].lower()
 	cols_str = arayToListString(schema["cols"])
 	cols_str_chr = arayToListString(schema["cols"],"?")
-	template = "function update({0}) ".format(cols_str)+"{\n" + "  return db.runQuery(`UPDATE {0}".format(schema["name"])
+	values = arayToListString([schema_object+"."+item+"\n" for item in schema["cols"]])
+	template = "function update({0}) ".format(schema_object)+"{\n" + "  return db.runQuery(`UPDATE {0}".format(schema["name"])
 	template += "\n    SET " + arayToListString(schema["cols"],"?",True) +"\n"
 	template += "    WHERE {0}.{1} = ?;`, [".format(schema["name"],schema["cols"][0]) +"\n"
-	template += "    "+cols_str +","+schema["cols"][0] + " ]);\n}"
+	template += "    "+values +","+schema["cols"][0] + " ]);\n}"
 	
 	return template
-
 
 def update_val_jsdoc(schema):
 	jsDoc_params = "/**\n" + " * Update {0} only one column value".format(schema["object"])+"\n"
@@ -86,8 +89,6 @@ def update_val_function(schema):
 	template += "    val,{0}]);".format(schema["cols"][0])+"\n}"
 	
 	return template
-
-
 
 def remove_jsdoc(schema):
 	jsDoc_params = "/**\n" + " * Delete {0} by {0} ID".format(schema["object"])+"\n"
@@ -152,6 +153,7 @@ def count_function(schema):
 
 	return template
 
+
 def module_exports(schema):
 	list_string = "module.exports = {\n"
 	count = 0
@@ -208,41 +210,8 @@ def print_functions(schema):
 
 	return code_string
 
-if __name__ == '__main__':
-	
-	
-
-	schema = {
-		"name":"media_archive.transactions",
-		"object":"Transaction",
-		"cols":["transaction_uid","clip_uid","action","date","user_uid","host_uid","app_uid","description"],
-		"functions": {
-			"list":"list",
-			"remove":"remove",
-			"update":"update",
-			"insert":"insert",
-			"find":"find",
-			"count":"count",
-			"updatecol":"updateCol"
-			}
-	}
-
-	module_name = object_plural(schema).lower() + ".js"
-	doc_title = "Model for {0} schema".format(object_plural(schema))
-	doc_string = module_jsdoc("Enrique Nieto Martínez",doc_title,1)
-	header = "const db = require('./db');" + "\n\n"
-
-	module_code = doc_string + header + print_functions(schema) + module_exports(schema)
-	# print(module_code)
-
-	path_save = "..\\..\\models\\"
-	path_save = "..//..//models//"
-	# path_save = ".\\models_gen\\"
-	path_save = ".//models_gen//"
-	print(path_save)
-	print(os.path.exists(path_save))
-
-
+def saveModel(path_save,module_name,module_code):
+	# Save file model js
 	dirname = os.path.dirname(__file__)
 	filename = os.path.join(dirname, path_save + module_name)
 	if os.path.exists(path_save):
@@ -250,4 +219,41 @@ if __name__ == '__main__':
 		print("saving: ",module_name)
 		with io.open(filename,'w',encoding='utf8') as f:
 			f.write(module_code)
+	else:
+		print("No existe el path:", path_save)
 
+def buildSchema(schema, path_save):
+	
+	if("built" in schema):
+		print("Ya se compiló:",schema["name"])
+	else:
+		# Name of model js
+		module_name = object_plural(schema).lower() + ".js"
+
+		# Header comment
+		doc_title = "Model for {0} schema".format(object_plural(schema))
+		doc_string = module_jsdoc("Enrique Nieto Martínez",doc_title,1)
+		header = "const db = require('./db');" + "\n\n"
+
+		#Merge all contents
+		module_code = doc_string + header + print_functions(schema) + module_exports(schema)
+		saveModel(path_save,module_name,module_code)
+
+
+if __name__ == '__main__':
+	
+	with open('project_schemas.json') as f:
+		data = f.read()
+
+	schemas = json.loads(data)
+
+	# WINDOWS
+	# path_save = "..\\..\\models\\"
+	# path_save = ".\\build\\"
+
+	# MAC OS
+	# path_save = "..//..//models//"
+	# path_save = ".//build//"
+	
+	for schema in schemas:
+		buildSchema(schema, ".\\build\\")

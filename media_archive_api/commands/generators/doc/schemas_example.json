@@ -1,0 +1,31 @@
+[
+	{
+		"name":"media_archive.transactions",
+		"object":"Transaction",
+		"cols":["transaction_uid","clip_uid","action","date","user_uid","host_uid","app_uid","description"],
+		"functions": {
+			"list":"list",
+			"remove":"remove",
+			"update":"update",
+			"insert":"insert",
+			"find":"find",
+			"count":"count",
+			"updatecol":"updateCol"
+		},
+		"built":"true"			
+	},
+	{
+		"name":"media_archive.relations",
+		"object":"Relation",
+		"cols":["relation_uid","clip_uid","action","date","user_uid","host_uid","app_uid","description"],
+		"functions": {
+			"list":"list",
+			"remove":"remove",
+			"update":"update",
+			"insert":"insert",
+			"find":"find",
+			"count":"count",
+			"updatecol":"updateCol"
+		}			
+	}
+]
